@@ -41,7 +41,7 @@ model Activity {
    trip Trip @relation(fields: [trip_id], references: [id])
   trip_id String
 
-  @@map("activity")
+  @@map("activities")
 }
 
 model Link {

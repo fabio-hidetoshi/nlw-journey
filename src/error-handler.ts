@@ -1,22 +1,20 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { ClientError } from "./errors/client-error";
 import { ZodError } from "zod";
 
-type FastifyErrorHandler = FastifyInstance["errorHandler"];
+type fastifyErrorHandler = FastifyInstance["errorHandler"];
 
-export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
-  if (error instanceof ZodError) {
-    return reply.status(400).send({
-      message: "Invalid input",
-      errors: error.flatten().fieldErrors,
+export const errorHandler: fastifyErrorHandler = (err, req, res) => {
+  console.log(err);
+  if (err instanceof ClientError) {
+    return res.status(400).send({
+      message: err.message,
+    });
+  } else if (err instanceof ZodError) {
+    return res.status(400).send({
+      message: "Validation error.",
+      errors: err.flatten().fieldErrors,
     });
   }
-
-  if (error instanceof ClientError) {
-    return reply.status(400).send({
-      message: error.message,
-    });
-  }
-
-  return reply.status(500).send({ message: "Internal Server Error" });
+  return res.status(500).send({ message: "Internal server error." });
 };
